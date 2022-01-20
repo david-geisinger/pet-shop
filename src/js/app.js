@@ -64,6 +64,7 @@ App = {
     $(document).on('click', '.btn-return', App.handleReturn);
   },
 
+  //Find the pups that have been adopted and make their button unclickable and change text
   markAdopted: function() {
     var adoptionInstance;
 
@@ -73,7 +74,6 @@ App = {
       return adoptionInstance.getAdopters.call();
     }).then(function(adopters) {
       for (i = 0; i < adopters.length; i++) {
-        console.log(adopters[i])
         if (adopters[i] !== '0x0000000000000000000000000000000000000000' && adopters[i] !== '0x') {
           $('.panel-pet').eq(i).find('button').text('Already Adopted').attr('disabled', true);
         }
@@ -83,6 +83,7 @@ App = {
     });
   },
 
+  //Find all the pets that you own
   getYourPets: function() {
     var adoptionInstance;
 
@@ -91,11 +92,11 @@ App = {
 
       return adoptionInstance.getAdopters.call();
     }).then(function(adopters) {
-      var hasPet = false;
-      var petsRow = $('#yourPetsRow');
+      App.resetPage();
+      var yourPetsRow = $('#yourPetsRow');
       for (i = 0; i < adopters.length; i++) {
+        //TODO - fix this to make sure it is your address
         if (adopters[i] !== '0x0000000000000000000000000000000000000000' && adopters[i] !== '0x') {
-          hasPet = true;
           var petTemplate = $('#petTemplate');
       
           petTemplate.find('.panel-title').text(petsJson[i].name);
@@ -107,19 +108,20 @@ App = {
           petTemplate.find('.btn-return').attr('data-id', petsJson[i].id);
           petTemplate.find('.btn-adopt').hide();
     
-          petsRow.append(petTemplate.html());
+          yourPetsRow.append(petTemplate.html());
         }
       }
-      if (!hasPet) {
-        var petsRow = $('#yourPetsRow');
-        petsRow.append("<b>You don't have any pets yet! Go back and adopt you jerk.</b>");
+      if (yourPetsRow.children().length == 0) {
+        yourPetsRow.append("<b>You don't have any pets yet! Go back and adopt you jerk.</b>");
       }
     }).catch(function(err) {
       console.log(err.message);
     });
   },
 
+  //Resets the adoption view - either on initialization or button click
   setAdoptionView: function(data) {
+    App.resetPage();
     var petsRow = $('#petsRow');
     var petTemplate = $('#petTemplate');
 
@@ -137,7 +139,7 @@ App = {
     }
   },
 
-
+  //Handle adopting a pup
   handleAdopt: function(event) {
     event.preventDefault();
 
@@ -163,6 +165,7 @@ App = {
     });
   },
 
+  //Function to handle returning a pup
   handleReturn: function(event) {
     event.preventDefault();
 
@@ -174,6 +177,7 @@ App = {
       if (error) {
         console.log(error);
       }
+      //TODO - Does this always have to be accounts[0]
       var account = accounts[0];
 
       App.contracts.Adoption.deployed().then(function(instance) {
@@ -186,27 +190,29 @@ App = {
         console.log(err.message);
       });
     });
+  },
+
+  //Function to handle resets, clears the contents of where we fill in the UI
+  resetPage: function() {
+    $("#yourPetsRow").empty();
+    $("#petsRow").empty();
   }
 };
 
+//Initial function called when page is loaded
 $(function() {
   $(window).load(function() {
     App.init();
   });
 });
 
+//Handles the button click from personal view
 function toPersonalView() {
-  resetPage();
   App.getYourPets();
 }
 
+//Handles the button click from adoption view
 function toAdoptionView() {
-  resetPage();
   App.setAdoptionView(petsJson);
   App.markAdopted()
-}
-
-function resetPage() {
-  $("#yourPetsRow").empty();
-  $("#petsRow").empty();
 }
