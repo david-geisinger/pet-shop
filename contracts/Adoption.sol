@@ -12,7 +12,7 @@ contract Adoption {
         return petId;
     }
 
-    // Give back naughty pet
+    // Give back naughty pet - updated comment
     function handleReturn(uint petId) public returns (uint) {
         require(petId >= 0 && petId <= 15);
         require(adopters[petId] == msg.sender);
