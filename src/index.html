@@ -16,6 +16,14 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <style>
+      .price {
+        width: 60px;
+      }
+      .btn {
+        vertical-align: baseline;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -51,6 +59,11 @@
             <strong>Age</strong>: <span class="pet-age">3</span><br/>
             <strong>Location</strong>: <span class="pet-location">Warren, MI</span><br/><br/>
             <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
+            <button class="btn btn-default btn-buy" type="button" data-id="0">Buy</button>
+            <label for="price" class="price-label">
+              Price
+              <input type="number" class="form-control price" min="1" value="1" name="price"/>
+            </label>
             <button class="btn btn-default btn-return" type="button" data-id="0">Give Back</button>
           </div>
         </div>

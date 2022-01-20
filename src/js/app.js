@@ -62,6 +62,7 @@ App = {
   bindEvents: function() {
     $(document).on('click', '.btn-adopt', App.handleAdopt);
     $(document).on('click', '.btn-return', App.handleReturn);
+    $(document).on('click', '.btn-buy', App.handleBuy);
   },
 
   //Find the pups that have been adopted and make their button unclickable and change text
@@ -76,6 +77,8 @@ App = {
       for (i = 0; i < adopters.length; i++) {
         if (adopters[i] !== '0x0000000000000000000000000000000000000000' && adopters[i] !== '0x') {
           $('.panel-pet').eq(i).find('button').text('Already Adopted').attr('disabled', true);
+          $('.panel-pet').eq(i).find('.btn-buy').hide();
+          $('.panel-pet').eq(i).find('.price-label').hide();
         }
       }
     }).catch(function(err) {
@@ -107,6 +110,8 @@ App = {
           petTemplate.find('.btn-return').show()
           petTemplate.find('.btn-return').attr('data-id', petsJson[i].id);
           petTemplate.find('.btn-adopt').hide();
+          petTemplate.find('.price-label').hide();
+          petTemplate.find('.btn-buy').hide()
     
           yourPetsRow.append(petTemplate.html());
         }
@@ -133,6 +138,10 @@ App = {
       petTemplate.find('.pet-location').text(data[i].location);
       petTemplate.find('.btn-adopt').show()
       petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
+      petTemplate.find('.btn-buy').show();
+      petTemplate.find('.btn-buy').attr('data-id', data[i].id);
+      petTemplate.find('.price-label').show();
+      petTemplate.find('.price').attr('id', 'price' + data[i].id);
       petTemplate.find('.btn-return').hide();
 
       petsRow.append(petTemplate.html());
@@ -196,10 +205,33 @@ App = {
   resetPage: function() {
     $("#yourPetsRow").empty();
     $("#petsRow").empty();
+  },
+
+  //Initial function called when page is loaded
+  handleBuy: function(event) {
+    event.preventDefault();
+    var petId = parseInt($(event.target).data('id'));
+    var adoptionInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error)
+        console.log(error);
+
+      var account = accounts[0];
+      App.contracts.Adoption.deployed().then(function(instance) {
+        adoptionInstance = instance;
+        var price = parseInt($('#price' + petId).val());
+        var priceInWei = price * (10 ** 18);
+        return adoptionInstance.handleBuy(petId, {from: account, value: priceInWei, gasLimit: 21000});
+      }).then(function(result) {
+        App.getYourPets();
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
   }
 };
 
-//Initial function called when page is loaded
 $(function() {
   $(window).load(function() {
     App.init();
