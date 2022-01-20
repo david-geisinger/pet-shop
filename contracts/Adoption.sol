@@ -17,7 +17,7 @@ contract Adoption {
         require(petId >= 0 && petId <= 15);
         require(adopters[petId] == msg.sender);
 
-        adopters[petId] = address(0); //Set to 0 spot
+        adopters[petId] = address(0); //Set to 0 address
 
         return petId;
     }
