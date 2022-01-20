@@ -222,7 +222,7 @@ App = {
         adoptionInstance = instance;
         var price = parseInt($('#price' + petId).val());
         var priceInWei = price * (10 ** 18);
-        return adoptionInstance.handleBuy(petId, {from: account, value: priceInWei, gasLimit: 21000});
+        return adoptionInstance.parseFloat(petId, {from: account, value: priceInWei, gasLimit: 21000});
       }).then(function(result) {
         App.getYourPets();
       }).catch(function(err) {
